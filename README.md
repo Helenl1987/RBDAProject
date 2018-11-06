@@ -32,6 +32,10 @@ create external table business2 (hours_Monday string, hours_Thursday string, hou
 ```sql
 create external table user (compliment_more int, compliment_writer int, compliment_funny int, average_stars double, cool int, review_count int, compliment_plain int, friends string, compliment_note int, fans int, elite string, compliment_profile int, user_id string, yelping_since string, compliment_hot int, name string, compliment_photos int, compliment_cool int, compliment_list int, compliment_cute int, useful int, funny int) row format delimited fields terminated by '\t' location '/user/jl10005/project/user'
 ```
+## command - create table for user
+```sql
+create external table review (review_id string, user_id string, business_id string, stars double, date string, text string, useful int, funny int, cool int) row format delimited fields terminated by '\t' location '/user/REPLACE_BY_FILE_LOCATION';
+```
 
 ## command - create table for checkin
 ```sql
