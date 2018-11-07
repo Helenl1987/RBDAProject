@@ -1,22 +1,22 @@
-compliment_more
-compliment_writer
-compliment_funny
-average_stars
-cool
-review_count
-compliment_plain
-friends
-compliment_note
-fans
-elite
-compliment_profile
-user_id
-yelping_since
-compliment_hot
-name
-compliment_photos
-compliment_cool
-compliment_list
-compliment_cute
-useful
-funny
+compliment_more	int
+compliment_writer	int
+compliment_funny	int
+average_stars	double
+cool 	int
+review_count	int
+compliment_plain	int
+friends	string
+compliment_note	int
+fans	int
+elite	string
+compliment_profile	int
+user_id	string
+yelping_since	string
+compliment_hot 	int
+name	string
+compliment_photos	int
+compliment_cool	int
+compliment_list	int
+compliment_cute	int
+useful	int
+funny 	int
