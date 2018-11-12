@@ -1,28 +1,24 @@
 # RBDAProject
 
 ## TODOList
-* 爬Yelp Rating
-* Twitter
-* github
-* business+user: schema, command, basic profile -> github
-	* profile business + user
-	* schema business + user
-	* join and count
-* review+checkin+tip: schema, command, basic profile -> github
-* join
-    * business checkin
-    * business review
-    * business government
-    * user tip
-    * business tip
-    * user review
-* clean
-    * business
+* Yelp Rating Fail Case Try Again
+* ZL:
+    * business category
+    * mobility feature
+    * geography feature
+    * restaurant inspection data
+* JL:
+    * trend spliting
+        * original... , yelping_since, # time window, start, end, rating, trend
+        * yyyy-mm
+        * \t
     * review
+        * BOW
+        * Embedding
 
 ## command - create table for business
 ```sql
-create external table business (hours_Monday string, hours_Thursday string, hours_Friday string, hours_Wednesday string, hours_Tuesday string, hours_Saturday string, address string, city string, is_open int, latitude double, review_count int, stars double, name string, attributes_BikeParking string, attributes_BusinessAcceptsCreditCards string, attributes_RestaurantsDelivery string, attributes_BusinessParking_garage string, attributes_BusinessParking_street string, attributes_BusinessParking_validated string, attributes_BusinessParking_lot string, attributes_BusinessParking_valet string, attributes_NoiseLevel string, attributes_RestaurantsGoodForGroups string, attributes_RestaurantsPriceRange2 int, attributes_RestaurantsReservations string, attributes_RestaurantsTakeOut string, attributes_GoodForKids string, attributes_RestaurantsAttire string, attributes_HasTV string, attributes_OutdoorSeating string, neighborhood string, state string, categories string, postal_code string, business_id string, longitude double, hours_Sunday string, attributes_RestaurantsTableService string, attributes_Alcohol string, attributes_WheelchairAccessible string, attributes_Caters string, attributes_WiFi string, attributes_GoodForMeal_dessert string, attributes_GoodForMeal_latenight string, attributes_GoodForMeal_lunch string, attributes_GoodForMeal_dinner string, attributes_GoodForMeal_breakfast string, attributes_GoodForMeal_brunch string, attributes_Ambience_romantic string, attributes_Ambience_intimate string, attributes_Ambience_classy string, attributes_Ambience_hipster string, attributes_Ambience_touristy string, attributes_Ambience_trendy string, attributes_Ambience_upscale string, attributes_Ambience_casual string, hours string, attributes_Ambience_divey string) row format delimited fields terminated by '\t' location 'LOCATION'
+create external table business (hours_Monday string, hours_Thursday string, hours_Friday string, hours_Wednesday string, hours_Tuesday string, hours_Saturday string, address string, city string, is_open int, latitude double, review_count int, stars double, name string, attributes_BikeParking string, attributes_BusinessAcceptsCreditCards string, attributes_RestaurantsDelivery string, attributes_BusinessParking_garage string, attributes_BusinessParking_street string, attributes_BusinessParking_validated string, attributes_BusinessParking_lot string, attributes_BusinessParking_valet string, attributes_NoiseLevel string, attributes_RestaurantsGoodForGroups string, attributes_RestaurantsPriceRange2 string, attributes_RestaurantsReservations string, attributes_RestaurantsTakeOut string, attributes_GoodForKids string, attributes_RestaurantsAttire string, attributes_HasTV string, attributes_OutdoorSeating string, neighborhood string, state string, categories string, postal_code string, business_id string, longitude double, hours_Sunday string, attributes_RestaurantsTableService string, attributes_Alcohol string, attributes_WheelchairAccessible string, attributes_Caters string, attributes_WiFi string, attributes_GoodForMeal_dessert string, attributes_GoodForMeal_latenight string, attributes_GoodForMeal_lunch string, attributes_GoodForMeal_dinner string, attributes_GoodForMeal_breakfast string, attributes_GoodForMeal_brunch string, attributes_Ambience_romantic string, attributes_Ambience_intimate string, attributes_Ambience_classy string, attributes_Ambience_hipster string, attributes_Ambience_touristy string, attributes_Ambience_trendy string, attributes_Ambience_upscale string, attributes_Ambience_casual string, hours string, attributes_Ambience_divey string) row format delimited fields terminated by '\t' location 'LOCATION'
 ```
 
 
@@ -34,7 +30,7 @@ create external table user (compliment_more int, compliment_writer int, complime
 
 ## command - create table for review
 ```sql
-create external table review (review_id string, user_id string, business_id string, stars double, date string, text string, useful int, funny int, cool int) row format delimited fields terminated by '\t' location '/user/REPLACE_BY_FILE_LOCATION';
+create external table review (review_id string, user_id string, business_id string, stars double, dates string, text string, useful int, funny int, cool int) row format delimited fields terminated by '\t' location '/user/REPLACE_BY_FILE_LOCATION';
 ```
 
 ## command - create table for checkin
@@ -45,4 +41,10 @@ create external table checkin (Mon_0 smallint, Mon_1 smallint, Mon_2 smallint, M
 ## command - create table for tip
 ```sql
 create external table tip (text string, date string, likes int, business_id string, user_id string) row format delimited fields terminated by '\t' location '/user/REPLACE_BY_FILE_LOCATION';
+```
+
+
+## command - create table for yelp rating
+```sql
+create external table rating_details (name string, address string, business_id string,  zip string, neighborhood string, city string, state string, review_sum  int,  star_5  int,  star_4  int,  star_3  int,  star_2  int,  star_1  int,  has_trend  int, 2018_10  double,  2018_9  double,  2018_8  double, 2018_7  double,  2018_6  double,  2018_5  double,  2018_4  double,  2018_3  double, 2018_2  double,  2018_1  double,  2018_0  double, 2017_11  double,  2017_10  double,  2017_9  double,  2017_8  double,  2017_7  double,  2017_6  double,  2017_5  double,  2017_4  double,  2017_3  double,  2017_2  double,  2017_1  double,  2017_0  double, 2016_11  double,  2016_10  double,  2016_9  double,  2016_8  double,  2016_7  double,  2016_6  double,  2016_5  double,  2016_4  double,  2016_3  double,  2016_2  double,  2016_1  double,  2016_0  double, 2015_11  double,  2015_10  double,  2015_9  double,  2015_8  double,  2015_7  double,  2015_6  double,  2015_5  double,  2015_4  double,  2015_3  double,  2015_2  double,  2015_1  double,  2015_0  double, 2014_11  double,  2014_10  double,  2014_9  double,  2014_8  double,  2014_7  double,  2014_6  double,  2014_5  double,  2014_4  double,  2014_3  double,  2014_2  double,  2014_1  double,  2014_0  double) row format delimited fields terminated by '\t' location '/user/REPLACE_BY_FILE_LOCATION';
 ```
