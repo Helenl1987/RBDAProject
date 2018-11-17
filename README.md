@@ -9,12 +9,11 @@
     * restaurant inspection data
 * JL:
     * trend spliting
-        * original... , yelping_since, # time window, start, end, rating, trend
-        * yyyy-mm
-        * \t
+        * done
     * review
         * BOW
         * Embedding
+        * LDA
 
 ## command - create table for business
 ```sql
