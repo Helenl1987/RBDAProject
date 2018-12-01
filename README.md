@@ -12,7 +12,10 @@
         * done
     * review
         * BOW
+            * weighted LR
+            * review attribute (useful, funny, cool)
         * Embedding
+        * Paragraph
         * LDA
 
 ## command - create table for business
