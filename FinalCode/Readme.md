@@ -23,27 +23,19 @@
 	* TrendSpliting.java
 		* generate time window for business trend data crawled from yelp
 		* build and run
-		
-		```javac -classpath `yarn classpath` -d . TrendSpliting.java ```
-		
-		```jar -cvf trendSpliting.jar *.class ```
-		
-		```hadoop jar trendSpliting.jar TrendSpliting /user/jl10005/project/rating/crawl_result.tsv /user/jl10005/project/myout ```
+			* ```javac -classpath `yarn classpath` -d . TrendSpliting.java ```
+			* ```jar -cvf trendSpliting.jar *.class ```
+			* ```hadoop jar trendSpliting.jar TrendSpliting /user/jl10005/project/rating/crawl_result.tsv /user/jl10005/project/myout ```
 		* results location
-		
-		```/user/jl10005/project/myout```
+			* ```/user/jl10005/project/myout```
 	* DO.java
 		* review analysis (generate NLP features for reviews and do primary test to evaluate them)
 		* build and run
-		
-		```javac -classpath /opt/cloudera/parcels/SPARK2-2.2.0.cloudera1-1.cdh5.12.0.p0.142354/lib/spark2/jars/*:`yarn classpath` DO.java ```
-  		
-  		```jar -cvf tryAnalytics.jar *.class```
-  		
-  		```spark2-submit --master yarn --deploy-mode cluster --class DO reviewAnalysis.jar ```
+			* ```javac -classpath /opt/cloudera/parcels/SPARK2-2.2.0.cloudera1-1.cdh5.12.0.p0.142354/lib/spark2/jars/*:`yarn classpath` DO.java ```
+  			* ```jar -cvf tryAnalytics.jar *.class```
+  			* ```spark2-submit --master yarn --deploy-mode cluster --class DO reviewAnalysis.jar ```
   		* results location
-  		
-  		```/user/jl10005/project/JOINDF```
+  			* ```/user/jl10005/project/JOINDF```
   	* impala_record.sql
   		* primary table processing (selecting, filtering, joining) using impala
   		* build and run
