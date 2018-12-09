@@ -40,7 +40,7 @@
   		* primary table processing (selecting, filtering, joining) using impala
   		* build and run
   			* in impala shell
-* /Readme.txt
+* Readme.txt
 	* readme file
 
 
