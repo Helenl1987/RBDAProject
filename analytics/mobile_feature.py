@@ -8,7 +8,7 @@ from pyspark.sql import SQLContext
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-bfile = open('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/spark_data/checkin_lv.txt')
+bfile = open('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/spark_data/checkin_toronto.txt')
 
 lines = []
 
@@ -79,5 +79,5 @@ def peer_pop(line):
 			   cate_count=line['cate_count'],peer_pop=avg)
 
 mf_all_feature = mf_rdd.map(lambda a: peer_pop(a))
-mf_all_feature.saveAsPickleFile('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/spark_data/checkins_lv_mobile')
+mf_all_feature.saveAsPickleFile('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/spark_data/checkins_toronto_mobile')
 

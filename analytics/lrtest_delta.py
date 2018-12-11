@@ -13,17 +13,20 @@ from pyspark.sql.functions import *
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-bfile = open('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/spark_data/crawling_withtrend.txt')
+bfile = open('/Users/zimoli/Desktop/crawling_withtrend2.txt')
 
 target = []
 
+id_dict = {}
 for line in bfile:
 	fields = line[:-1].split('\t')
 	temp = []
-	if fields[5] == 'las vegas':
-		temp.append(fields[2])
-		temp.extend(fields[14:])
-		target.append('\t'.join(temp))
+	if fields[5] == 'phoenix':
+		if fields[2] not in id_dict:
+			id_dict[fields[2]] = 1
+			temp.append(fields[2])
+			temp.extend(fields[14:])
+			target.append('\t'.join(temp))
 
 sc = SparkContext("local", "train")
 sqlContext = HiveContext(sc)
@@ -42,7 +45,7 @@ def flat_trend(line):
 rdd_flat = rdd.flatMap(lambda line: flat_trend(line))
 trend_df = sqlContext.createDataFrame(rdd_flat, ['business_id', 'start', 'end', 'rating', 'trend'])
 
-geo_rdd = sc.pickleFile('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/res_cate_ts').cache()
+geo_rdd = sc.pickleFile('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/phoenix_cate_ts').cache()
 
 
 trend_list = sc.broadcast([[str(row['business_id']),str(row['start']),str(row['end']),str(row['rating']),str(row['trend'])] for row in trend_df.collect()])
@@ -93,7 +96,30 @@ def create_label_point(line):
 			feat = [0, (float(ents[1])-float(ents[0]))*100, (float(comps[1])-float(comps[0]))*10000]
 		return LabeledPoint(float(line['label']), feat)
 
+def create_string_feature(line):
+	dens = line['dens'].split('+')
+	comps = line['comps'].split('+')
+	ents = line['ents'].split('+')
+	ws = line['window'].split('_')
+	new_window = ws[0]+'_'+ws[1]+','+ws[2]+'_'+ws[3]
+	if len(dens) == 2 and len(comps) == 2 and len(ents) == 2:
+		if float(dens[1]) != 0:
+			feat = [(float(dens[1])-float(dens[0]))/float(dens[1]), (float(ents[1])-float(ents[0]))*100, (float(comps[1])-float(comps[0]))*10000]
+		else:
+			feat = [0, (float(ents[1])-float(ents[0]))*100, (float(comps[1])-float(comps[0]))*10000]
+		feat = [str(f) for f in feat]
+		sfeat = ','.join(feat)
+		result = line['business_id']+','+new_window+'\t'+sfeat
+		return result
+
 geo_data = geo_rdd_grouped.rdd
+
+geo_sf = geo_data.map(lambda x: create_string_feature(x))
+
+geo_sf.saveAsTextFile("/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/geo_feature_phoenix")
+
+
+
 
 geo_set = geo_data.map(lambda line: create_label_point(line))
 geo_set_f = geo_set.filter(lambda line: line is not None)
@@ -109,7 +135,7 @@ trainErr = labelsAndPreds.filter(lambda lp: lp[0] != lp[1]).count() / float(trai
 print("Training Error = " + str(trainErr))
 
 predictionAndLabels = test.map(lambda lp: (float(model.predict(lp.features)), lp.label))
-testErr = labelsAndPreds.filter(lambda lp: lp[0] != lp[1]).count() / float(training.count())
+testErr = predictionAndLabels.filter(lambda lp: lp[0] != lp[1]).count() / float(test.count())
 print("Testing Error = " + str(testErr))
 # Instantiate metrics object
 metrics = BinaryClassificationMetrics(predictionAndLabels)

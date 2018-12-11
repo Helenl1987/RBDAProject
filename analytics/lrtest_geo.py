@@ -13,17 +13,20 @@ from pyspark.sql.functions import sum, count, max
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-bfile = open('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/spark_data/crawling_withtrend.txt')
+bfile = open('/Users/zimoli/Desktop/crawling_withtrend2.txt')
 
 target = []
 
+id_dict = {}
 for line in bfile:
 	fields = line[:-1].split('\t')
 	temp = []
-	if fields[5] == 'las vegas':
-		temp.append(fields[2])
-		temp.extend(fields[14:])
-		target.append('\t'.join(temp))
+	if fields[5] == 'toronto':
+		if fields[2] not in id_dict:
+			id_dict[fields[2]] = 1
+			temp.append(fields[2])
+			temp.extend(fields[14:])
+			target.append('\t'.join(temp))
 
 sc = SparkContext("local", "train")
 sqlContext = HiveContext(sc)
@@ -42,7 +45,7 @@ def flat_trend(line):
 rdd_flat = rdd.flatMap(lambda line: flat_trend(line))
 trend_df = sqlContext.createDataFrame(rdd_flat, ['business_id', 'start', 'end', 'rating', 'trend'])
 
-mobile_rdd = sc.pickleFile('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/spark_data/checkins_lv_mobile').cache()
+mobile_rdd = sc.pickleFile('/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/spark_data/checkins_toronto_mobile').cache()
 
 
 trend_list = sc.broadcast([[str(row['business_id']),str(row['start']),str(row['end']),str(row['rating']),str(row['trend'])] for row in trend_df.collect()])
@@ -69,5 +72,45 @@ get_trend_map(trend_map)
 
 trend_map_b = sc.broadcast(trend_map)
 
-traing_data = []
+def map_time_window(line):
+	bid = str(line['business_id'])
+	ts = str(line['dates'])
+	key = bid+'_'+ts
+	if key in trend_map_b.value:
+		fields = ((trend_map_b.value)[key]).split('_')
+		label = float(fields[-1])
+		twindow = '_'.join(fields[:-1])
+		return Row(business_id=line['business_id'],ts=line['dates'],business_cate=line['main_cate'],\
+			   cate_count=float(line['cate_count']), peer_pop=float(line['peer_pop']),\
+			   window=twindow,label=label)
+
+mobile_rdd_win = mobile_rdd.map(lambda line: map_time_window(line))
+mobile_rdd_f = mobile_rdd_win.filter(lambda line: line is not None)
+mobile_df = mobile_rdd_f.toDF()
+
+mobile_rdd_grouped = mobile_df.groupBy("business_id", "window").agg(sum("cate_count").alias('cc_sum'), sum("peer_pop").alias('pp_sum'), count("business_id").alias("data_count"), max("label").alias('label'))
+
+mobile_rdd_avg0 = mobile_rdd_grouped.withColumn('cc_avg', mobile_rdd_grouped.cc_sum / mobile_rdd_grouped.data_count)
+mobile_rdd_avg = mobile_rdd_avg0.withColumn('pp_avg', mobile_rdd_grouped.pp_sum / mobile_rdd_grouped.data_count)
+
+def create_string_feature(line):
+	sfeat = str(line['cc_avg'])+','+str(line['pp_avg'])
+	ws = line['window'].split('_')
+	new_window = ws[0]+'_'+ws[1]+','+ws[2]+'_'+ws[3]
+	result = line['business_id']+','+new_window+'\t'+sfeat
+	return result
+
+mobile_data = mobile_rdd_avg.rdd
+
+mobile_sf = mobile_data.map(lambda x: create_string_feature(x))
+
+mobile_sf.saveAsTextFile("/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/mobile_feature_toronto")
+
+
+
+
+
+
+
+
 
