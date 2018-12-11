@@ -1,0 +1,2 @@
+We've done our whole analytics steps iteratively in the dataset of three selected cities: las vegas, phoenix, toronto
+So we didn't provide seperate codes for iteration here, as they are distributed in all the analytics steps we have wrote.

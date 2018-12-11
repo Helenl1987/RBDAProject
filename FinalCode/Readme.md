@@ -6,6 +6,7 @@
 * profiling_code
 	* code for data profiling
 * code_iterations
+	* iterations
 * screenshots
 	* screenshots that show the analytic running
 * analytics
@@ -35,12 +36,12 @@
   			* ```jar -cvf tryAnalytics.jar *.class```
   			* ```spark2-submit --master yarn --deploy-mode cluster --class DO reviewAnalysis.jar ```
   		* results location
-  			* ```/user/jl10005/project/JOINDF```
-  	* impala_record.sql
+  			* may vary due to the invoking of different functions for various tasks, but all results are under ```/user/jl10005/project/```
+  	* impala_record
   		* primary table processing (selecting, filtering, joining) using impala
   		* build and run
   			* in impala shell
-* Readme.txt
+* Readme.md
 	* readme file
 
 
