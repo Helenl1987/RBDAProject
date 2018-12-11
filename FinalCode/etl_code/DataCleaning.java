@@ -24,7 +24,7 @@ import java.util.Map;
 
 
 
-class DataProfileMapper extends Mapper<LongWritable, Text, Text, Text> {
+class DataCleaningMapper extends Mapper<LongWritable, Text, Text, Text> {
 	// business
 	static final int CATEGORIES = 32;
 	// column numbers after pre-counting (total restaurant 5791, drop < 10000)
@@ -51,12 +51,12 @@ class DataProfileMapper extends Mapper<LongWritable, Text, Text, Text> {
 		Configuration conf = context.getConfiguration();
 		String dataType = conf.get("data.type");
 		if(dataType.equals("business")) {
-			// clean_business(key, value, context);
-			profile_business(key, value, context);
+			clean_business(key, value, context);
+			// profile_business(key, value, context);
 		}
 		else if(dataType.equals("user")) {
-			// clean_user(key, value, context);
-			profile_user(key, value, context);
+			clean_user(key, value, context);
+			// profile_user(key, value, context);
 		}
 	}
 
@@ -80,34 +80,6 @@ class DataProfileMapper extends Mapper<LongWritable, Text, Text, Text> {
 		}
 	}
 
-	public void profile_business(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-		String line = value.toString();
-		String[] splitstring = line.split("\t");
-		for(int i = 0; i < splitstring.length; ++i) {
-			if(splitstring[i].equals("NULL"))
-				continue;
-			if(schema_business[i] == 0) {
-				context.write(new Text(String.valueOf(i+1)), new Text(String.valueOf(splitstring[i].length())));
-			}
-			else if(schema_business[i] == 1) {
-				try {
-					int num = Integer.parseInt(splitstring[i]);
-					context.write(new Text(String.valueOf(i+1)), new Text(splitstring[i]));
-				} catch(NumberFormatException e) {
-					context.write(new Text(String.valueOf(i+1)), new Text(String.format("(%s:%s)", splitstring[34], splitstring[i])));
-				}
-			}
-			else {
-				try {
-					double num = Double.parseDouble(splitstring[i]);
-					context.write(new Text(String.valueOf(i+1)), new Text(splitstring[i]));
-				} catch(NumberFormatException e) {
-					context.write(new Text(String.valueOf(i+1)), new Text(String.format("(%s:%s)", splitstring[34], splitstring[i])));
-				}
-			}
-		}
-	}
-
 	public void clean_user(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		String line = value.toString();
 		String[] splitstring = line.split("\t");
@@ -116,34 +88,6 @@ class DataProfileMapper extends Mapper<LongWritable, Text, Text, Text> {
 			for(int i = 0; i < splitstring.length; ++i) {
 				if(splitstring[i].trim().equals("0") == false) {
 					context.write(new Text(String.valueOf(i+1)), new Text("1"));
-				}
-			}
-		}
-	}
-
-	public void profile_user(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-		String line = value.toString();
-		String[] splitstring = line.split("\t");
-		for(int i = 0; i < splitstring.length; ++i) {
-			if(splitstring[i].equals("NULL"))
-				continue;
-			if(schema_user[i] == 0) {
-				context.write(new Text(String.valueOf(i+1)), new Text(String.valueOf(splitstring[i].length())));
-			}
-			else if(schema_user[i] == 1) {
-				try {
-					int num = Integer.parseInt(splitstring[i]);
-					context.write(new Text(String.valueOf(i+1)), new Text(splitstring[i]));
-				} catch(NumberFormatException e) {
-					context.write(new Text(String.valueOf(i+1)), new Text(String.format("(%s:%s)", splitstring[12], splitstring[i])));
-				}
-			}
-			else {
-				try {
-					double num = Double.parseDouble(splitstring[i]);
-					context.write(new Text(String.valueOf(i+1)), new Text(splitstring[i]));
-				} catch(NumberFormatException e) {
-					context.write(new Text(String.valueOf(i+1)), new Text(String.format("(%s:%s)", splitstring[12], splitstring[i])));
 				}
 			}
 		}
@@ -172,18 +116,18 @@ class DataProfileMapper extends Mapper<LongWritable, Text, Text, Text> {
 
 
 
-class DataProfileReducer extends Reducer<Text, Text, Text, Text> {
+class DataCleaningReducer extends Reducer<Text, Text, Text, Text> {
 	@Override
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 		Configuration conf = context.getConfiguration();
 		String dataType = conf.get("data.type");
 		if(dataType.equals("business")) {
-			// clean_business(key, values, context);
-			profile_business(key, values, context);
+			clean_business(key, values, context);
+			// profile_business(key, values, context);
 		}
 		else if(dataType.equals("user")) {
-			// clean_user(key, values, context);
-			profile_user(key, values, context);
+			clean_user(key, values, context);
+			// profile_user(key, values, context);
 		}
 	}
 
@@ -195,43 +139,12 @@ class DataProfileReducer extends Reducer<Text, Text, Text, Text> {
 		context.write(key, new Text(""));
 	}
 
-	public void profile_business(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-		double maxi = 0.0, mini = 0.0, tmp = 0.0;
-		String res = "";
-		for(Text value: values) {
-			try {
-				tmp = Double.parseDouble(value.toString());
-				if(tmp > maxi)
-					maxi = tmp;
-				if(tmp < mini)
-					mini = tmp;
-			} catch(NumberFormatException e) {
-				res += value.toString();
-			}
-		}
-		String maxistr = "", ministr = "";
-		if(maxi % 1.0 == 0)
-			maxistr = String.valueOf((long)maxi);
-		else
-			maxistr = String.valueOf(maxi);
-		if(mini % 1.0 == 0)
-			ministr = String.valueOf((long)mini);
-		else
-			ministr = String.valueOf(mini);
-		res = String.format("(%s, %s)", maxistr, ministr) + res;
-		context.write(key, new Text(res));
-	}
-
 	public void clean_user(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 		int res = 0;
 		for(Text value: values) {
 			res += 1;
 		}
 		context.write(key, new Text(String.valueOf(res)));
-	}
-
-	public void profile_user(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-		profile_business(key, values, context);
 	}
 }
 
@@ -241,7 +154,7 @@ class DataProfileReducer extends Reducer<Text, Text, Text, Text> {
 
 
 
-public class DataProfile {
+public class DataCleaning {
 	public static void main(String[] args) throws Exception {
 		String[] splitstring = args[0].split("/");
 		String dataType = splitstring[splitstring.length-1];
@@ -256,14 +169,14 @@ public class DataProfile {
 		conf.set("data.type", dataType);
 
 		Job job = Job.getInstance(conf);
-		job.setJarByClass(DataProfile.class);
-		job.setJobName("DataProfile");
+		job.setJarByClass(DataCleaning.class);
+		job.setJobName("DataCleaning");
 
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
-		job.setMapperClass(DataProfileMapper.class);
-		job.setReducerClass(DataProfileReducer.class);
+		job.setMapperClass(DataCleaningMapper.class);
+		job.setReducerClass(DataCleaningReducer.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);

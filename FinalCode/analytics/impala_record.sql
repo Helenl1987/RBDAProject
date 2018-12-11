@@ -1,0 +1,2 @@
+create table review_version1 as (select review.* from review, rating_details, business where review.business_id = rating_details.business_id and rating_details.has_trend = 1 and rating_details.business_id = business.business_id and business.city = 'las vegas' );
+impala-shell -q "select * from jl10005.review_version1" -B -output-delimiter="\t" -o /home/jl10005/project/review_version1.txt -i compute-1-1 -u jl10005

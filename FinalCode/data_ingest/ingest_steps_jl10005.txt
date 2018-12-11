@@ -1,0 +1,2 @@
+## copy the data into HDFS on dumbo
+## command: scp 'DATA_SOURCE_LOCATION' jl10005@dumbo.es.its.nyu.edu:/home/jl10005/project/
