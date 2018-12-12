@@ -116,7 +116,7 @@ geo_data = geo_rdd_grouped.rdd
 
 geo_sf = geo_data.map(lambda x: create_string_feature(x))
 
-geo_sf.saveAsTextFile("/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/geo_feature_phoenix")
+#geo_sf.saveAsTextFile("/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/geo_feature_phoenix")
 
 
 

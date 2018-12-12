@@ -104,7 +104,35 @@ mobile_data = mobile_rdd_avg.rdd
 
 mobile_sf = mobile_data.map(lambda x: create_string_feature(x))
 
-mobile_sf.saveAsTextFile("/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/mobile_feature_toronto")
+#mobile_sf.saveAsTextFile("/Users/zimoli/Downloads/RBDA-MCINTOSH/Project/RBDAProject/mobile_feature_toronto")
+
+def create_label_point(line):
+	feats = [float(line['cc_avg']), float(line['pp_avg'])]
+	return LabeledPoint(float(line['label']), feats)
+
+
+mobile_lp = mobile_data.map(lambda x: create_label_point(x))
+mobile_lp_f = mobile_lp_f.filter(lambda line: line is not None)
+
+training, test = mobile_lp_f.randomSplit([0.8, 0.2], seed=11)
+training.cache()
+
+
+model = LogisticRegressionWithLBFGS.train(training,iterations=500, regParam=0.01, regType='l2')
+labelsAndPreds = training.map(lambda p: (p.label, model.predict(p.features)))
+trainErr = labelsAndPreds.filter(lambda lp: lp[0] != lp[1]).count() / float(training.count())
+print("Training Error = " + str(trainErr))
+
+predictionAndLabels = test.map(lambda lp: (float(model.predict(lp.features)), lp.label))
+testErr = predictionAndLabels.filter(lambda lp: lp[0] != lp[1]).count() / float(test.count())
+print("Testing Error = " + str(testErr))
+# Instantiate metrics object
+metrics = BinaryClassificationMetrics(predictionAndLabels)
+# Area under precision-recall curve
+print("Area under PR = %s" % metrics.areaUnderPR)
+# Area under ROC curve
+print("Area under ROC = %s" % metrics.areaUnderROC)
+
 
 
 
