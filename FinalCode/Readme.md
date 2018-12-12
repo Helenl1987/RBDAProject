@@ -45,10 +45,10 @@
       	* ```spark2-submit --master yarn --deploy-mode cluster --class DO reviewAnalysis.jar ```
       * results location
       	* may vary due to the invoking of different functions for various tasks, but all results will be under ```/user/jl10005/project/```
-    * impala_record
-      * primary table processing (selecting, filtering, joining) using impala
-      * build and run
-        * in impala shell
+  * impala_record
+    * primary table processing (selecting, filtering, joining) using impala
+    * build and run
+      * in impala shell
   * rf_train.py
     * random forest model trained  on combined features
     * build and run:
